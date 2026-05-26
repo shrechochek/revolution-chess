@@ -124,7 +124,7 @@ body {
 }
 
 .square.valid-capture {
-    background-color: rgba(220, 100, 100, 0.6) !important;
+    background-color: rgb(221, 41, 41) !important;
 }
 
 .square.in-check {
@@ -137,7 +137,7 @@ body {
 
 /* Комбинация: если клетка одновременно last-move и valid-capture, приоритет у красного */
 .square.last-move.valid-capture {
-    background-color: rgba(220, 100, 100, 0.6) !important;
+    background-color: rgb(221, 41, 41) !important;
 }
 
 .piece {

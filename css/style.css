@@ -1,0 +1,472 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1a1a2e;
+    min-height: 100vh;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 20px;
+    width: 100vw;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.game-info {
+    display: none; /* Перенесено в боковую панель */
+}
+
+.turn-indicator {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.move-counter {
+    font-size: 18px;
+    color: #666;
+}
+
+.event-notification {
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    display: none;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.event-notification.active {
+    display: block;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ffd700 100%);
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    animation: pulse 0.5s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.board-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+
+.chess-board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 0;
+    width: calc(100vh - 40px);
+    height: calc(100vh - 40px);
+    max-width: calc(100vh - 40px);
+    max-height: calc(100vh - 40px);
+    border: 3px solid #333;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.square {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.square.light {
+    background-color: #f0d9b5;
+}
+
+.square.dark {
+    background-color: #b58863;
+}
+
+.square.selected {
+    background-color: #7fc97f !important;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.square.valid-move {
+    background-color: #90ee90 !important;
+}
+
+.square.valid-move::after {
+    content: '';
+    position: absolute;
+    width: 30%;
+    height: 30%;
+    background-color: rgba(0, 128, 0, 0.5);
+    border-radius: 50%;
+}
+
+.square.valid-capture {
+    background-color: rgba(220, 80, 80, 0.75) !important;
+}
+
+.square.in-check {
+    background-color: #ff6b6b !important;
+}
+
+.square.last-move {
+    background-color: #ffeb99 !important;
+}
+
+.piece {
+    width: 85%;
+    height: 85%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    transition: transform 0.1s;
+}
+
+.square:hover .piece {
+    transform: scale(1.1);
+}
+
+.square-label {
+    position: absolute;
+    font-size: 12px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.3);
+}
+
+.square-label.file {
+    bottom: 2px;
+    right: 4px;
+}
+
+.square-label.rank {
+    top: 2px;
+    left: 4px;
+}
+
+.game-controls {
+    display: none; /* Перенесено в боковую панель */
+}
+
+.btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    width: 100%;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    opacity: 0.9;
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-new-game {
+    background: #28a745;
+}
+
+.btn-undo {
+    background: #dc3545;
+}
+
+.captured-pieces {
+    display: none; /* Временно скрыто */
+    gap: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.captured-white, .captured-black {
+    flex: 1;
+}
+
+.captured-pieces h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.pieces-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-height: 50px;
+}
+
+.captured-piece {
+    width: 40px;
+    height: 40px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.7;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.promotion-choices {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.promotion-choice {
+    width: 80px;
+    height: 80px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    border: 3px solid transparent;
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.promotion-choice:hover {
+    border-color: #667eea;
+    transform: scale(1.1);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .chess-board {
+        width: min(90vw, 90vh);
+        height: min(90vw, 90vh);
+    }
+    
+    .game-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .captured-pieces {
+        flex-direction: column;
+    }
+}
+
+
+/* Активные модификаторы */
+.active-modifiers {
+    display: none; /* Перенесено в боковую панель */
+}
+
+.sidebar .active-modifiers {
+    display: block;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+    min-width: auto;
+}
+
+.sidebar .active-modifiers h3 {
+    margin: 0 0 15px 0;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+}
+
+.modifiers-list {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    min-height: 60px;
+}
+
+.no-modifiers {
+    color: #888;
+    font-style: italic;
+    font-size: 14px;
+}
+
+.modifier-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 12px;
+    background: rgba(60, 60, 80, 0.8);
+    border-radius: 8px;
+    transition: transform 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modifier-item:hover {
+    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.modifier-icon {
+    width: 80px;
+    height: 80px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.modifier-name {
+    font-size: 10px;
+    font-weight: normal;
+    color: #888;
+    text-align: center;
+    opacity: 0.7;
+}
+
+
+/* Боковая панель */
+.sidebar {
+    width: 300px;
+    background: rgba(30, 30, 46, 0.95);
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+}
+
+.sidebar-section {
+    background: rgba(40, 40, 60, 0.6);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-section h3 {
+    margin: 0 0 15px 0;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.sidebar .turn-indicator {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+}
+
+.sidebar .move-counter {
+    font-size: 16px;
+    color: #aaa;
+    text-align: center;
+}
+
+.sidebar-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+/* Мины */
+.mine {
+    position: absolute;
+    font-size: 30px;
+    pointer-events: none;
+    z-index: 1;
+    animation: minePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes minePulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% { 
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+
+/* Эффект взрыва */
+.explosion-effect {
+    position: fixed;
+    font-size: 80px;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    animation: explode 1s ease-out forwards;
+}
+
+@keyframes explode {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}

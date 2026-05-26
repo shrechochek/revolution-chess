@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Revolution Chess</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <div>
+          <p class="eyebrow">Revolution Chess</p>
+          <h1>Шахматы с событиями</h1>
+          <p class="subtitle">Классические правила + основа случайных ивентов раз в N ходов.</p>
+        </div>
+        <div class="controls">
+          <div class="control">
+            <label for="event-interval">Событие каждые N ходов</label>
+            <input id="event-interval" type="number" min="1" value="6" />
+          </div>
+          <button id="reset">Новая партия</button>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="board-panel">
+          <div class="board" id="board" aria-label="Шахматная доска" role="grid"></div>
+          <div class="status" id="status"></div>
+        </section>
+
+        <aside class="side">
+          <section class="card">
+            <h2>Журнал ходов</h2>
+            <ol id="moves" class="moves"></ol>
+          </section>
+          <section class="card">
+            <h2>Ивенты</h2>
+            <ul id="events" class="events"></ul>
+            <p class="hint">Пока что ивенты не применяются, но логика вызова уже есть.</p>
+          </section>
+          <section class="card">
+            <h2>Подсказка</h2>
+            <p>Кликни фигуру, затем клетку назначения. Взятия, рокировка, взятие на проходе и превращение пешки поддерживаются.</p>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <div class="modal" id="promotion-modal" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true">
+        <h3>Превращение пешки</h3>
+        <div class="promotion-options" id="promotion-options"></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

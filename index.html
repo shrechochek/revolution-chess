@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revolution Chess</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Боковая панель -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <div class="turn-indicator">
+                    <span id="current-turn">Ход белых</span>
+                </div>
+                <div class="move-counter">
+                    <span>Ход: <span id="move-number">1</span></span>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Модификаторы</h3>
+                <div class="modifiers-list" id="modifiers-list">
+                    <span class="no-modifiers">Нет активных</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Управление</h3>
+                <div class="sidebar-buttons">
+                    <button id="new-game-btn" class="btn btn-new-game">Новая игра</button>
+                    <button id="undo-btn" class="btn btn-undo">Отменить ход</button>
+                </div>
+            </div>
+            
+            <div class="event-notification" id="event-notification"></div>
+        </div>
+        
+        <!-- Доска -->
+        <div class="board-container">
+            <div id="chess-board" class="chess-board"></div>
+        </div>
+    </div>
+
+    <!-- Скрытые элементы -->
+    <div class="game-info" style="display: none;">
+        <div class="turn-indicator">
+            <span id="current-turn-hidden">Ход белых</span>
+        </div>
+        <div class="move-counter">
+            <span>Ход: <span id="move-number-hidden">1</span></span>
+        </div>
+    </div>
+    
+    <div class="active-modifiers" style="display: none;">
+        <h3>Активные модификаторы:</h3>
+        <div class="modifiers-list" id="modifiers-list-hidden">
+            <span class="no-modifiers">Нет активных модификаторов</span>
+        </div>
+    </div>
+    
+    <div class="game-controls" style="display: none;">
+        <button id="new-game-btn-hidden" class="btn">Новая игра</button>
+        <button id="undo-btn-hidden" class="btn">Отменить ход</button>
+    </div>
+
+    <div class="captured-pieces">
+        <div class="captured-white">
+            <h3>Захваченные белые:</h3>
+            <div id="captured-white" class="pieces-list"></div>
+        </div>
+        <div class="captured-black">
+            <h3>Захваченные черные:</h3>
+            <div id="captured-black" class="pieces-list"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для превращения пешки -->
+    <div id="promotion-modal" class="modal">
+        <div class="modal-content">
+            <h2>Выберите фигуру для превращения</h2>
+            <div class="promotion-choices" id="promotion-choices"></div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

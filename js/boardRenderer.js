@@ -32,25 +32,30 @@ export class BoardRenderer {
             square.classList.add('selected');
         }
         
-        // Подсветка валидных ходов
+        // Подсветка последнего хода (добавляем ПЕРЕД валидными ходами)
+        const isLastMoveSquare = this.game.lastMove && (
+            (this.game.lastMove.from.row === row && this.game.lastMove.from.col === col) ||
+            (this.game.lastMove.to.row === row && this.game.lastMove.to.col === col)
+        );
+        if (isLastMoveSquare) {
+            square.classList.add('last-move');
+        }
+        
+        // Подсветка валидных ходов (добавляем ПОСЛЕ последнего хода, чтобы перебить)
         if (this.game.validMoves.some(move => move.row === row && move.col === col)) {
+            const move = this.game.validMoves.find(m => m.row === row && m.col === col);
             const piece = this.game.board.getPiece(row, col);
-            if (piece && !piece.invulnerable) {
-                // Подсвечиваем клетку красным для возможного взятия
+            
+            // Проверяем, является ли это ходом со взятием
+            if (move.isCapture || (piece && !piece.invulnerable)) {
+                // Красная подсветка для взятия (включая en passant)
+                // Перебивает last-move благодаря порядку добавления классов
                 square.classList.add('valid-capture');
             } else if (!piece) {
-                // Обычная подсветка для пустых клеток
+                // Зеленая подсветка для обычного хода
                 square.classList.add('valid-move');
             }
             // Неуязвимые фигуры не подсвечиваются
-        }
-        
-        // Подсветка последнего хода
-        if (this.game.lastMove) {
-            if ((this.game.lastMove.from.row === row && this.game.lastMove.from.col === col) ||
-                (this.game.lastMove.to.row === row && this.game.lastMove.to.col === col)) {
-                square.classList.add('last-move');
-            }
         }
         
         // Подсветка шаха
@@ -72,6 +77,8 @@ export class BoardRenderer {
             const rankLabel = document.createElement('span');
             rankLabel.className = 'square-label rank';
             rankLabel.textContent = 8 - row;
+            // Цвет противоположной клетки
+            rankLabel.style.color = isLight ? '#b58863' : '#f0d9b5';
             square.appendChild(rankLabel);
         }
         
@@ -79,6 +86,8 @@ export class BoardRenderer {
             const fileLabel = document.createElement('span');
             fileLabel.className = 'square-label file';
             fileLabel.textContent = String.fromCharCode(97 + col);
+            // Цвет противоположной клетки
+            fileLabel.style.color = isLight ? '#b58863' : '#f0d9b5';
             square.appendChild(fileLabel);
         }
         

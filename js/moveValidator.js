@@ -56,11 +56,11 @@ export class MoveValidator {
         
         // Движение вперед на одну клетку
         if (this.board.isSquareEmpty(row + direction, col)) {
-            moves.push({ row: row + direction, col });
+            moves.push({ row: row + direction, col, isCapture: false });
             
             // Движение вперед на две клетки с начальной позиции
             if (row === startRow && this.board.isSquareEmpty(row + 2 * direction, col)) {
-                moves.push({ row: row + 2 * direction, col });
+                moves.push({ row: row + 2 * direction, col, isCapture: false });
             }
         }
         
@@ -71,12 +71,12 @@ export class MoveValidator {
             const targetPiece = this.board.getPiece(newRow, newCol);
             
             if (targetPiece && targetPiece.color !== color) {
-                moves.push({ row: newRow, col: newCol });
+                moves.push({ row: newRow, col: newCol, isCapture: true });
             }
             
             // Взятие на проходе
             if (this.canEnPassant(row, col, newCol, color)) {
-                moves.push({ row: newRow, col: newCol });
+                moves.push({ row: newRow, col: newCol, isCapture: true, isEnPassant: true });
             }
         }
         
@@ -141,10 +141,10 @@ export class MoveValidator {
                 const targetPiece = this.board.getPiece(newRow, newCol);
                 
                 if (!targetPiece) {
-                    moves.push({ row: newRow, col: newCol });
+                    moves.push({ row: newRow, col: newCol, isCapture: false });
                 } else {
                     if (targetPiece.color !== color) {
-                        moves.push({ row: newRow, col: newCol });
+                        moves.push({ row: newRow, col: newCol, isCapture: true });
                     }
                     break;
                 }
@@ -170,8 +170,10 @@ export class MoveValidator {
             
             if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
                 const targetPiece = this.board.getPiece(newRow, newCol);
-                if (!targetPiece || targetPiece.color !== color) {
-                    moves.push({ row: newRow, col: newCol });
+                if (!targetPiece) {
+                    moves.push({ row: newRow, col: newCol, isCapture: false });
+                } else if (targetPiece.color !== color) {
+                    moves.push({ row: newRow, col: newCol, isCapture: true });
                 }
             }
         }
@@ -193,8 +195,10 @@ export class MoveValidator {
             
             if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
                 const targetPiece = this.board.getPiece(newRow, newCol);
-                if (!targetPiece || targetPiece.color !== color) {
-                    moves.push({ row: newRow, col: newCol });
+                if (!targetPiece) {
+                    moves.push({ row: newRow, col: newCol, isCapture: false });
+                } else if (targetPiece.color !== color) {
+                    moves.push({ row: newRow, col: newCol, isCapture: true });
                 }
             }
         }
@@ -219,7 +223,7 @@ export class MoveValidator {
         if (kingsideRook && kingsideRook.type === 'rook' && !kingsideRook.hasMoved) {
             if (this.board.isSquareEmpty(row, 5) && this.board.isSquareEmpty(row, 6)) {
                 if (!this.isSquareUnderAttack(row, 5, color) && !this.isSquareUnderAttack(row, 6, color)) {
-                    moves.push({ row, col: 6 });
+                    moves.push({ row, col: 6, isCapture: false });
                 }
             }
         }
@@ -229,7 +233,7 @@ export class MoveValidator {
         if (queensideRook && queensideRook.type === 'rook' && !queensideRook.hasMoved) {
             if (this.board.isSquareEmpty(row, 1) && this.board.isSquareEmpty(row, 2) && this.board.isSquareEmpty(row, 3)) {
                 if (!this.isSquareUnderAttack(row, 2, color) && !this.isSquareUnderAttack(row, 3, color)) {
-                    moves.push({ row, col: 2 });
+                    moves.push({ row, col: 2, isCapture: false });
                 }
             }
         }
@@ -378,8 +382,10 @@ export class MoveValidator {
             
             if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
                 const targetPiece = this.board.getPiece(newRow, newCol);
-                if (!targetPiece || targetPiece.color !== color) {
-                    moves.push({ row: newRow, col: newCol });
+                if (!targetPiece) {
+                    moves.push({ row: newRow, col: newCol, isCapture: false });
+                } else if (targetPiece.color !== color) {
+                    moves.push({ row: newRow, col: newCol, isCapture: true });
                 }
             }
         }
@@ -404,10 +410,10 @@ export class MoveValidator {
                 const targetPiece = this.board.getPiece(newRow, newCol);
                 
                 if (!targetPiece) {
-                    moves.push({ row: newRow, col: newCol });
+                    moves.push({ row: newRow, col: newCol, isCapture: false });
                 } else {
                     if (targetPiece.color !== color) {
-                        moves.push({ row: newRow, col: newCol });
+                        moves.push({ row: newRow, col: newCol, isCapture: true });
                     }
                     break; // Останавливаемся при встрече с фигурой
                 }
@@ -445,8 +451,10 @@ export class MoveValidator {
             
             if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
                 const targetPiece = this.board.getPiece(newRow, newCol);
-                if (!targetPiece || targetPiece.color !== color) {
-                    moves.push({ row: newRow, col: newCol });
+                if (!targetPiece) {
+                    moves.push({ row: newRow, col: newCol, isCapture: false });
+                } else if (targetPiece.color !== color) {
+                    moves.push({ row: newRow, col: newCol, isCapture: true });
                 }
             }
         }
@@ -467,7 +475,7 @@ export class MoveValidator {
                 const targetPiece = this.board.getPiece(r, c);
                 // Может ходить только на пустые клетки (не может есть)
                 if (!targetPiece) {
-                    moves.push({ row: r, col: c });
+                    moves.push({ row: r, col: c, isCapture: false });
                 }
             }
         }

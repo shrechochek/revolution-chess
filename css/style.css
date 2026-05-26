@@ -124,7 +124,7 @@ body {
 }
 
 .square.valid-capture {
-    background-color: rgba(220, 80, 80, 0.75) !important;
+    background-color: rgba(220, 100, 100, 0.6) !important;
 }
 
 .square.in-check {
@@ -133,6 +133,11 @@ body {
 
 .square.last-move {
     background-color: #ffeb99 !important;
+}
+
+/* Комбинация: если клетка одновременно last-move и valid-capture, приоритет у красного */
+.square.last-move.valid-capture {
+    background-color: rgba(220, 100, 100, 0.6) !important;
 }
 
 .piece {
@@ -151,19 +156,19 @@ body {
 
 .square-label {
     position: absolute;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: bold;
-    color: rgba(0, 0, 0, 0.3);
+    opacity: 0.8;
 }
 
 .square-label.file {
-    bottom: 2px;
-    right: 4px;
+    bottom: 4px;
+    right: 6px;
 }
 
 .square-label.rank {
-    top: 2px;
-    left: 4px;
+    top: 4px;
+    left: 6px;
 }
 
 .game-controls {

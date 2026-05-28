@@ -8,6 +8,9 @@ class ChessApp {
         this.renderer = new BoardRenderer(this.game);
         this.eventManager = new EventManager(this.game);
         
+        // Передаем ссылку на рендерер в EventManager
+        this.eventManager.renderer = this.renderer;
+        
         this.init();
     }
     

@@ -1,3 +1,5 @@
+import { BoardRenderer } from './boardRenderer.js';
+
 export class EventManager {
     constructor(game) {
         this.game = game;
@@ -5,6 +7,12 @@ export class EventManager {
         this.events = []; // Массив для будущих событий
         this.activeEvent = null;
         this.activeEvents = []; // Активные события
+        this.renderer = null; // Ссылка на рендерер для обновления доски
+        
+        // РЕЖИМ ОТЛАДКИ: добавьте ID событий, которые НЕ должны происходить
+        // Пример: this.debugBlacklist = ['global_warming', 'ice_age'];
+        // Для тестирования конкретного события оставьте только его
+        this.debugBlacklist = []; // Пустой массив = все события доступны
         
         // Определение событий с их блэклистами
         this.eventDefinitions = [
@@ -25,8 +33,24 @@ export class EventManager {
                 name: 'Минное поле',
                 handler: this.minefield.bind(this),
                 blacklist: [] // Может быть с любыми другими событиями
+            },
+            {
+                id: 'airborne',
+                name: 'Десант',
+                handler: this.airborne.bind(this),
+                blacklist: [] // Может быть с любыми другими событиями
             }
         ];
+        
+        // Логирование доступных событий в консоль
+        console.log('🎲 Revolution Chess - Доступные события:');
+        this.eventDefinitions.forEach(event => {
+            const isBlocked = this.debugBlacklist.includes(event.id);
+            console.log(`  ${isBlocked ? '❌' : '✅'} ${event.id} - ${event.name}`);
+        });
+        if (this.debugBlacklist.length > 0) {
+            console.log('⚠️ РЕЖИМ ОТЛАДКИ: Заблокированы события:', this.debugBlacklist);
+        }
     }
     
     checkForEvent() {
@@ -59,18 +83,26 @@ export class EventManager {
         
         // Фильтруем события, которые могут быть активированы
         const availableEvents = this.eventDefinitions.filter(eventDef => {
+            // Проверяем отладочный блэклист
+            if (this.debugBlacklist.includes(eventDef.id)) {
+                return false;
+            }
+            
             // Проверяем, не конфликтует ли событие с активными
             return !eventDef.blacklist.some(blacklistedId => activeEventIds.includes(blacklistedId));
         });
         
         if (availableEvents.length === 0) {
             this.showEventNotification('⚠️ Нет доступных событий из-за конфликтов');
+            console.log('⚠️ Нет доступных событий. Активные:', activeEventIds, 'Заблокированы:', this.debugBlacklist);
             return;
         }
         
         // Выбираем случайное событие
         const randomEvent = availableEvents[Math.floor(Math.random() * availableEvents.length)];
+        console.log('🎲 Активировано событие:', randomEvent.id, '-', randomEvent.name);
         randomEvent.handler();
+        BoardRenderer.render();
     }
     
     globalWarming() {
@@ -106,6 +138,11 @@ export class EventManager {
         });
         
         this.updateModifiersDisplay();
+        
+        // Обновляем доску сразу после события
+        if (this.renderer) {
+            this.renderer.render();
+        }
     }
     
     iceAge() {
@@ -138,6 +175,11 @@ export class EventManager {
         });
         
         this.updateModifiersDisplay();
+        
+        // Обновляем доску сразу после события
+        if (this.renderer) {
+            this.renderer.render();
+        }
     }
     
     minefield() {
@@ -172,6 +214,62 @@ export class EventManager {
         });
         
         this.updateModifiersDisplay();
+        
+        // Обновляем доску сразу после события (хотя мины невидимы)
+        if (this.renderer) {
+            this.renderer.render();
+        }
+    }
+    
+    airborne() {
+        this.showEventNotification('🪂 ДЕСАНТ! Пехота высаживается на вражеской территории!');
+        
+        // Высаживаем 3 белые пешки на черной половине (ряды 0-3)
+        this.spawnPawns('white', 1, 3, 3);
+        
+        // Высаживаем 3 черные пешки на белой половине (ряды 4-7)
+        this.spawnPawns('black', 4, 6, 3);
+        
+        this.activeEvents.push({
+            id: 'airborne',
+            name: 'Десант',
+            icon: 'airborne',
+            active: true
+        });
+        
+        this.updateModifiersDisplay();
+        
+        // Обновляем доску сразу после события
+        if (this.renderer) {
+            this.renderer.render();
+        }
+    }
+    
+    spawnPawns(color, startRow, endRow, count) {
+        const emptySquares = [];
+        
+        // Находим все пустые клетки в указанном диапазоне рядов
+        for (let row = startRow; row <= endRow; row++) {
+            for (let col = 0; col < 8; col++) {
+                const piece = this.game.board.getPiece(row, col);
+                if (!piece) {
+                    emptySquares.push({ row, col });
+                }
+            }
+        }
+        
+        // Перемешиваем и выбираем случайные клетки для пешек
+        for (let i = 0; i < Math.min(count, emptySquares.length); i++) {
+            const randomIndex = Math.floor(Math.random() * emptySquares.length);
+            const square = emptySquares.splice(randomIndex, 1)[0];
+            
+            // Создаем пешку
+            this.game.board.setPiece(square.row, square.col, {
+                type: 'pawn',
+                color: color,
+                hasMoved: true // Пешка уже "сходила", не может прыгнуть на 2 клетки
+            });
+        }
     }
     
     updateModifiersDisplay() {
